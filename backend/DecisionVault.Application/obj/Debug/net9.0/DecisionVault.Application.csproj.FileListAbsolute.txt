@@ -1,0 +1,15 @@
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Application/bin/Debug/net9.0/DecisionVault.Application.deps.json
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Application/bin/Debug/net9.0/DecisionVault.Application.dll
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Application/bin/Debug/net9.0/DecisionVault.Application.pdb
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Application/bin/Debug/net9.0/DecisionVault.Domain.dll
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Application/bin/Debug/net9.0/DecisionVault.Domain.pdb
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Application/obj/Debug/net9.0/DecisionVault.Application.csproj.AssemblyReference.cache
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Application/obj/Debug/net9.0/DecisionVault.Application.GeneratedMSBuildEditorConfig.editorconfig
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Application/obj/Debug/net9.0/DecisionVault.Application.AssemblyInfoInputs.cache
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Application/obj/Debug/net9.0/DecisionVault.Application.AssemblyInfo.cs
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Application/obj/Debug/net9.0/DecisionVault.Application.csproj.CoreCompileInputs.cache
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Application/obj/Debug/net9.0/Decision.D819F531.Up2Date
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Application/obj/Debug/net9.0/DecisionVault.Application.dll
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Application/obj/Debug/net9.0/refint/DecisionVault.Application.dll
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Application/obj/Debug/net9.0/DecisionVault.Application.pdb
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Application/obj/Debug/net9.0/ref/DecisionVault.Application.dll

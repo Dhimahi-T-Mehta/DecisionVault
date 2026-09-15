@@ -1,0 +1,17 @@
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Infrastructure/obj/Debug/net9.0/DecisionVault.Infrastructure.csproj.AssemblyReference.cache
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Infrastructure/obj/Debug/net9.0/DecisionVault.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Infrastructure/obj/Debug/net9.0/DecisionVault.Infrastructure.AssemblyInfoInputs.cache
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Infrastructure/obj/Debug/net9.0/DecisionVault.Infrastructure.AssemblyInfo.cs
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Infrastructure/obj/Debug/net9.0/DecisionVault.Infrastructure.csproj.CoreCompileInputs.cache
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Infrastructure/bin/Debug/net9.0/DecisionVault.Infrastructure.deps.json
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Infrastructure/bin/Debug/net9.0/DecisionVault.Infrastructure.dll
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Infrastructure/bin/Debug/net9.0/DecisionVault.Infrastructure.pdb
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Infrastructure/bin/Debug/net9.0/DecisionVault.Application.dll
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Infrastructure/bin/Debug/net9.0/DecisionVault.Domain.dll
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Infrastructure/bin/Debug/net9.0/DecisionVault.Application.pdb
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Infrastructure/bin/Debug/net9.0/DecisionVault.Domain.pdb
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Infrastructure/obj/Debug/net9.0/Decision.91ACF157.Up2Date
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Infrastructure/obj/Debug/net9.0/DecisionVault.Infrastructure.dll
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Infrastructure/obj/Debug/net9.0/refint/DecisionVault.Infrastructure.dll
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Infrastructure/obj/Debug/net9.0/DecisionVault.Infrastructure.pdb
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Infrastructure/obj/Debug/net9.0/ref/DecisionVault.Infrastructure.dll

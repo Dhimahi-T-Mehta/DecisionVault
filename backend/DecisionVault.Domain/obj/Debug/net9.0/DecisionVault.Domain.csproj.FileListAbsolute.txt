@@ -1,0 +1,11 @@
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Domain/obj/Debug/net9.0/DecisionVault.Domain.GeneratedMSBuildEditorConfig.editorconfig
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Domain/obj/Debug/net9.0/DecisionVault.Domain.AssemblyInfoInputs.cache
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Domain/obj/Debug/net9.0/DecisionVault.Domain.AssemblyInfo.cs
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Domain/obj/Debug/net9.0/DecisionVault.Domain.csproj.CoreCompileInputs.cache
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Domain/bin/Debug/net9.0/DecisionVault.Domain.deps.json
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Domain/bin/Debug/net9.0/DecisionVault.Domain.dll
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Domain/bin/Debug/net9.0/DecisionVault.Domain.pdb
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Domain/obj/Debug/net9.0/DecisionVault.Domain.dll
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Domain/obj/Debug/net9.0/refint/DecisionVault.Domain.dll
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Domain/obj/Debug/net9.0/DecisionVault.Domain.pdb
+/home/user/Desktop/DecisionVault/backend/DecisionVault.Domain/obj/Debug/net9.0/ref/DecisionVault.Domain.dll
