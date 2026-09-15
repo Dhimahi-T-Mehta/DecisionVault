@@ -1,5 +1,7 @@
 using System.Text;
+using System.Collections.Generic;
 using ASPCache = Microsoft.Extensions.Caching.Memory;
+using DecisionVault.API;
 using DecisionVault.API.Configuration;
 using DecisionVault.API.Middleware;
 using DecisionVault.Application.Interfaces;
@@ -11,7 +13,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,7 +46,12 @@ builder.Services
         JwtTokenService.ValidationParameters(jwtSettings));
 
 builder.Services.AddAuthorization();
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    // Date-only strings (e.g. "2026-09-15") deserialize with Kind=Unspecified, which
+    // Npgsql rejects for timestamptz columns. Normalize to UTC at the boundary.
+    options.JsonSerializerOptions.Converters.Add(new UtcDateTimeConverter());
+});
 builder.Services.AddConsistentApiErrors();
 
 // ---------- CORS / Swagger ----------
@@ -71,14 +78,11 @@ builder.Services.AddSwaggerGen(options =>
         In = ParameterLocation.Header,
         Description = "Paste the JWT returned by /api/auth/login."
     });
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
     {
         {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
-            },
-            Array.Empty<string>()
+            new OpenApiSecuritySchemeReference("Bearer", document),
+            new List<string>()
         }
     });
 });
@@ -91,7 +95,10 @@ app.UseMiddleware<GlobalExceptionMiddleware>();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    // Explicit endpoint: the default multi-definition bootstrap resolves the spec
+    // URL as "" and swagger-ui's version-pragma mis-detects it (isOAS3=false)
+    // even though the document is valid OpenAPI 3.0.4.
+    app.UseSwaggerUI(options => options.SwaggerEndpoint("/swagger/v1/swagger.json", "DecisionVault API v1"));
 }
 
 app.UseCors("frontend");
