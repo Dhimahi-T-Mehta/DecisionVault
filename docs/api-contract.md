@@ -105,6 +105,7 @@ All decision endpoints are user-scoped: a non-admin sees only own decisions; own
 - GET /admin/dashboard → 200 `AdminDashboardDto` `{ totalUsers, activeUsers, totalDecisions, decisionsByStatus[], decisionsByCategory[], overallSuccessRate, recentActivity: [{ id, eventType, description, userEmail, createdAt }] }`
 - GET /admin/users?page=&pageSize=&search= → `PagedResult<AdminUserDto>` `{ id, fullName, email, role, isActive, createdAt, decisionCount }`
 - PUT /admin/users/{id}/status `{ isActive: bool }` → 200 `AdminUserDto` (403 attempting to deactivate self)
+- PUT /admin/users/{id}/role `{ role: "User"|"Admin" }` → 200 `AdminUserDto` (400 unknown role; 403 demoting self)
 - GET /admin/activity?page=&pageSize= → `PagedResult<ActivityDto>` (recent events across users, no decision content — event types + category-level info only)
 
 ## Profile extras

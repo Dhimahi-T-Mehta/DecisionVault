@@ -67,5 +67,6 @@ public interface IAdminService
     Task<AdminDashboardDto> GetDashboardAsync(CancellationToken ct = default);
     Task<PagedResult<AdminUserDto>> GetUsersAsync(string? search, int page, int pageSize, CancellationToken ct = default);
     Task<AdminUserDto> SetUserActiveAsync(int userId, bool isActive, int actingAdminId, CancellationToken ct = default);
+    Task<AdminUserDto> SetUserRoleAsync(int userId, string role, int actingAdminId, CancellationToken ct = default);
     Task<PagedResult<ActivityDto>> GetActivityAsync(int page, int pageSize, CancellationToken ct = default);
 }

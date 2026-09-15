@@ -24,6 +24,10 @@ public class AdminController(IAdminService adminService) : ControllerBase
     public async Task<ActionResult<AdminUserDto>> SetUserStatus(int id, UpdateUserStatusRequest request, CancellationToken ct) =>
         Ok(await adminService.SetUserActiveAsync(id, request.IsActive, User.GetUserId(), ct));
 
+    [HttpPut("users/{id:int}/role")]
+    public async Task<ActionResult<AdminUserDto>> SetUserRole(int id, UpdateUserRoleRequest request, CancellationToken ct) =>
+        Ok(await adminService.SetUserRoleAsync(id, request.Role, User.GetUserId(), ct));
+
     [HttpGet("activity")]
     public async Task<ActionResult<PagedResult<ActivityDto>>> GetActivity(
         [FromQuery] int page = 1, [FromQuery] int pageSize = 20, CancellationToken ct = default) =>

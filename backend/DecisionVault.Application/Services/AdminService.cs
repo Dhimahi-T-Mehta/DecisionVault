@@ -90,6 +90,24 @@ public class AdminService(IUnitOfWork uow) : IAdminService
             user.CreatedAt, user.Decisions.Count);
     }
 
+    public async Task<AdminUserDto> SetUserRoleAsync(int userId, string role, int actingAdminId, CancellationToken ct = default)
+    {
+        if (role is not ("User" or "Admin"))
+            throw new ValidationException("Role must be either 'User' or 'Admin'.");
+        if (userId == actingAdminId && role != "Admin")
+            throw new ForbiddenException("You cannot demote your own admin account.");
+
+        var user = await uow.Users.QueryWhere(u => u.Id == userId, asNoTracking: false).FirstOrDefaultAsync(ct)
+            ?? throw new NotFoundException("User not found.");
+
+        user.Role = role;
+        user.UpdatedAt = DateTime.UtcNow;
+        await uow.SaveChangesAsync(ct);
+
+        return new AdminUserDto(user.Id, user.FullName, user.Email, user.Role, user.IsActive,
+            user.CreatedAt, user.Decisions.Count);
+    }
+
     public async Task<PagedResult<ActivityDto>> GetActivityAsync(int page, int pageSize, CancellationToken ct = default)
     {
         page = Math.Max(1, page);

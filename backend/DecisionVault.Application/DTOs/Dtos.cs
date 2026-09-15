@@ -158,6 +158,7 @@ public record AnalyticsDto(
 public record AdminUserDto(int Id, string FullName, string Email, string Role, bool IsActive, DateTime CreatedAt, int DecisionCount);
 public record UpdateUserStatusRequest(bool IsActive);
 public record ActivityDto(int Id, string EventType, string Description, string UserEmail, DateTime CreatedAt);
+public record UpdateUserRoleRequest(string Role);
 public record AdminDashboardDto(
     int TotalUsers,
     int ActiveUsers,
