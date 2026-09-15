@@ -95,6 +95,19 @@ app.UseMiddleware<GlobalExceptionMiddleware>();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
+    // Serve swagger UI assets with no-store: Chromium heuristically caches the ~1.4 MB
+    // bundle (no Last-Modified on the response), so a Swashbuckle upgrade would otherwise
+    // keep serving the stale UI from browser cache until a hard refresh.
+    app.Use(async (context, next) =>
+    {
+        if (context.Request.Path.StartsWithSegments("/swagger"))
+            context.Response.OnStarting(() =>
+            {
+                context.Response.Headers.CacheControl = "no-store";
+                return Task.CompletedTask;
+            });
+        await next();
+    });
     // Explicit endpoint: the default multi-definition bootstrap resolves the spec
     // URL as "" and swagger-ui's version-pragma mis-detects it (isOAS3=false)
     // even though the document is valid OpenAPI 3.0.4.
