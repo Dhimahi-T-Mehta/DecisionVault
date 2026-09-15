@@ -45,6 +45,12 @@ public class DecisionVaultDbContext(DbContextOptions<DecisionVaultDbContext> opt
             e.Property(d => d.Status).HasConversion<string>().HasMaxLength(20);
             e.Property(d => d.ExpectedOutcome).HasMaxLength(1000);
             e.Property(d => d.ConfidenceScore).HasColumnName("confidence_score");
+            // DB-level guards mirroring DtoValidator (defense in depth; InMemory tests skip these).
+            e.ToTable(t =>
+            {
+                t.HasCheckConstraint("CK_decisions_confidence_range", "\"confidence_score\" BETWEEN 1 AND 100");
+                t.HasCheckConstraint("CK_decisions_expected_range", "\"ExpectedSuccessScore\" BETWEEN 1 AND 100");
+            });
 
             e.HasOne(d => d.User)
                 .WithMany(u => u.Decisions)
@@ -76,6 +82,11 @@ public class DecisionVaultDbContext(DbContextOptions<DecisionVaultDbContext> opt
             e.Property(o => o.Description).HasMaxLength(500);
             e.Property(o => o.Advantages).HasMaxLength(500);
             e.Property(o => o.Disadvantages).HasMaxLength(500);
+            e.ToTable(t =>
+            {
+                t.HasCheckConstraint("CK_decision_options_score_range", "\"Score\" BETWEEN 0 AND 10");
+                t.HasCheckConstraint("CK_decision_options_weight_range", "\"Weight\" BETWEEN 0 AND 10");
+            });
 
             e.HasOne(o => o.Decision)
                 .WithMany(d => d.Options)
@@ -107,6 +118,7 @@ public class DecisionVaultDbContext(DbContextOptions<DecisionVaultDbContext> opt
             e.Property(r => r.WhatWentWell).HasMaxLength(500);
             e.Property(r => r.WhatWentWrong).HasMaxLength(500);
             e.Property(r => r.LessonsLearned).HasMaxLength(500);
+            e.ToTable(t => t.HasCheckConstraint("CK_decision_reviews_rating_range", "\"outcome_rating\" BETWEEN 1 AND 5"));
 
             e.HasOne(r => r.Decision)
                 .WithOne(d => d.Review)

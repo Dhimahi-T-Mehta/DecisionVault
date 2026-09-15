@@ -5,11 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DecisionVault.API.Controllers;
 
-/// <summary>Category catalog + admin management routes live in CategoriesController.</summary>
-public static class ControllerExtensions
-{
-}
-
 [ApiController]
 [Route("api/profile")]
 [Authorize]

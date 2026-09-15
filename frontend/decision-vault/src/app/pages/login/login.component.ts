@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { ApiClientError } from '../../core/api';
 
@@ -65,13 +65,16 @@ export class LoginComponent {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   readonly form = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', Validators.required]
   });
   readonly busy = signal(false);
-  readonly error = signal<string | null>(null);
+  readonly error = signal<string | null>(this.route.snapshot.queryParamMap.get('expired') === '1'
+    ? 'Your session expired. Please sign in again.'
+    : null);
 
   submit(): void {
     if (this.form.invalid || this.busy()) return;

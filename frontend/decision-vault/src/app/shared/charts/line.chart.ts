@@ -4,6 +4,8 @@ export interface Point {
   x: number;   // category index
   y: number;   // value
   label?: string;
+  /** Calendar year when x is a month number (1-12); axis labels append it. */
+  year?: number;
 }
 
 /** Simple line/area chart over a 0..100 or auto-scaled domain. */

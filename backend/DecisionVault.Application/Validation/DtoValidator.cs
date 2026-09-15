@@ -95,6 +95,9 @@ public static partial class DtoValidator
         return parsed;
     }
 
+    /// <summary>Same rule as <see cref="EmailRegex"/>; exposed for profile updates.</summary>
+    public static bool EmailFormatIsValid(string email) => EmailRegex().IsMatch(email);
+
     [System.Text.RegularExpressions.GeneratedRegex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$")]
     private static partial System.Text.RegularExpressions.Regex EmailRegex();
 }

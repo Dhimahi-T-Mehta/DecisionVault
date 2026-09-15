@@ -191,6 +191,12 @@ public class DecisionService(
         if (decision.Status is not (DecisionStatus.Draft or DecisionStatus.Evaluating))
             throw new ConflictException("Options can only be modified while the decision is Draft or Evaluating.");
 
+        // Unique index (DecisionId, Name) backs this; check here so the user gets a
+        // 409 envelope instead of a raw DbUpdateException → 500.
+        var name = request.Name.Trim();
+        if (decision.Options.Any(o => string.Equals(o.Name, name, StringComparison.OrdinalIgnoreCase)))
+            throw new ConflictException($"An option named '{name}' already exists on this decision.");
+
         var option = new DecisionOption
         {
             DecisionId = decisionId,
@@ -222,7 +228,12 @@ public class DecisionService(
         var option = decision.Options.FirstOrDefault(o => o.Id == optionId)
             ?? throw new NotFoundException("Option not found for this decision.");
 
-        option.Name = request.Name.Trim();
+        // Renaming to a sibling's name must yield 409, not a raw unique-index violation.
+        var newName = request.Name.Trim();
+        if (decision.Options.Any(o => o.Id != optionId && string.Equals(o.Name, newName, StringComparison.OrdinalIgnoreCase)))
+            throw new ConflictException($"An option named '{newName}' already exists on this decision.");
+
+        option.Name = newName;
         option.Description = request.Description?.Trim();
         option.Advantages = request.Advantages?.Trim();
         option.Disadvantages = request.Disadvantages?.Trim();
@@ -297,6 +308,10 @@ public class DecisionService(
 
         var option = decision.Options.FirstOrDefault(o => o.Id == request.OptionId)
             ?? throw new NotFoundException("Option not found for this decision.");
+
+        if (decision.Status == DecisionStatus.Draft)
+            await TransitionInternalAsync(decision, DecisionStatus.Evaluating, "Evaluation started");
+
 
         decision.SelectedOptionId = option.Id;
         AddEvent(decision, EventTypes.OptionSelected, $"Option '{option.Name}' marked as intended choice");

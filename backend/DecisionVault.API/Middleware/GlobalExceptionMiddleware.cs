@@ -2,6 +2,8 @@ using System.Net;
 using System.Text.Json;
 using DecisionVault.Domain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace DecisionVault.API.Middleware;
 
@@ -40,6 +42,11 @@ public class GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExcep
             ForbiddenException fb => (HttpStatusCode.Forbidden, fb.Message, null),
             ValidationException ve => (HttpStatusCode.BadRequest, ve.Message, ve.Errors),
             UnauthorizedException ue => (HttpStatusCode.Unauthorized, ue.Message, null),
+            // Unique-index race (e.g. simultaneous registrations with the same email):
+            // the service pre-checks, but only the DB constraint is authoritative.
+            DbUpdateException dbEx when dbEx.InnerException is PostgresException pg
+                                      && pg.SqlState == PostgresErrorCodes.UniqueViolation
+                => (HttpStatusCode.Conflict, "A record with these details already exists.", (IReadOnlyList<string>?)null),
             _ => (HttpStatusCode.InternalServerError, "An unexpected error occurred. Please try again.", null)
         };
 

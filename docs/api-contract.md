@@ -48,8 +48,9 @@ All decision endpoints are user-scoped: a non-admin sees only own decisions; own
 - DELETE /decisions/{id} → 204 (cascades options/reasons/review/events)
 
 ### Options
-- POST /decisions/{id}/options → 201 `DecisionOptionDto` (only while status Draft/Evaluating; 409 otherwise)
-- PUT /decisions/{id}/options/{optionId} → 200 (same status rule)
+- POST /decisions/{id}/options → 201 `DecisionOptionDto` (only while status Draft/Evaluating; 409 otherwise;
+  409 `"An option named '…' already exists on this decision."` on duplicate name, case-insensitive)
+- PUT /decisions/{id}/options/{optionId} → 200 (same status rule; rename to a sibling's name → 409)
 - DELETE /decisions/{id}/options/{optionId} → 204 (409 if it is the SelectedOption of a Decided+ decision)
 - DecisionOptionDto: `{ id, decisionId, name (1-100), description?, advantages?, disadvantages?, score (0-10, nullable), weight (0-10, default 5) }`
 
@@ -59,7 +60,9 @@ All decision endpoints are user-scoped: a non-admin sees only own decisions; own
 - DecisionReasonDto: `{ id, decisionId, type: "Pro"|"Con"|"Note", category (1-60), text (1-500) }`
 
 ### Lifecycle
-- POST /decisions/{id}/select-option `{ optionId }` → 200 `DecisionDto` — transitions Draft|Evaluating → Decided (409 invalid transition)
+- POST /decisions/{id}/select-option `{ optionId }` → 200 `DecisionDto` — selects the option and
+  moves the decision to `Decided`. From `Draft` it walks Draft→Evaluating→Decided (two `StatusChanged`
+  events); from `Evaluating` it goes directly (409 on any other source status).
 - POST /decisions/{id}/transition `{ status: "InProgress"|"ReadyForReview"|"Evaluating" }` → 200 `DecisionDto` — allowed forward moves only per state machine
 - State machine: `Draft → Evaluating → Decided → InProgress → ReadyForReview → Reviewed`; backward moves prohibited except Decided→Evaluating (re-open evaluation, clears selection).
 - POST /decisions/{id}/finalize `{ selectedOptionId?, confidenceScore (1-100), expectedSuccessScore (1-100), expectedOutcome (1-1000 chars) }` → 200 `DecisionDto`

@@ -32,16 +32,25 @@ before changing shared code.
 ## Testing notes
 
 - Backend tests use **EF Core InMemory** with the real `DecisionVaultDbContext`,
-  `Repository<T>` and `UnitOfWork`. Mocking `IQueryable` with Moq alone breaks because
-  services call `FirstOrDefaultAsync`/`ToListAsync` (needs `IAsyncQueryProvider`).
-  The InMemory provider is safe here because `OnModelCreating` contains no
-  Npgsql-specific configuration (only column naming + default schema).
+  `Repository<T>` and `UnitOfWork` (47 tests: auth, decisions CRUD, lifecycle transitions
+  incl. the Decided→Evaluating re-open, finalize/review scoring, duplicate-option conflicts,
+  cross-user authorization, admin service, dashboard). Mocking `IQueryable` with Moq alone
+  breaks because services call `FirstOrDefaultAsync`/`ToListAsync` (needs
+  `IAsyncQueryProvider`). The InMemory provider is safe here because `OnModelCreating`
+  contains no Npgsql-specific configuration (column naming, CHECK constraints are
+  metadata-only — verify constraint behavior against PostgreSQL, see `security.md`).
 - `ServiceFixture` seeds one category + two users and shares them via
   `IClassFixture`; each test class gets a fresh database (unique name per fixture).
 - Assert exception **types**, and messages only where the message is an API contract
-  (e.g. `"Invalid email or password."`, `"Decision is already finalized."`).
-- Frontend specs run with `--browsers=ChromeHeadless` (Chrome available at
-  `~/.local/bin/google-chrome`).
+  (e.g. `"Invalid email or password."`, `"already exists on this decision."`).
+- Frontend specs (15) run with `--browsers=ChromeHeadless` (Chrome available at
+  `~/.local/bin/google-chrome`). End-to-end HTTP journey lives in `/tmp/e2e.sh` during
+  dev; API-level negative scenarios (dup option 409, skip transition 409, double review 409)
+  are also asserted there.
+
+- Deleting an option referenced as `SelectedOptionId` is handled two ways: the FK is
+  `ON DELETE SET NULL`, and the service explicitly nulls it on re-open — belt and
+  suspenders for the InMemory provider.
 
 ## Known quirks
 
@@ -54,11 +63,10 @@ before changing shared code.
   `textContent` ("1Compared decisions") — cosmetic only.
 - `AuthService.applySession()` is public purely so tests can seed a session without
   an HTTP round trip.
-- Deleting an option referenced as `SelectedOptionId` is handled two ways: the FK is
-  `ON DELETE SET NULL`, and `DecisionService.DeleteAsync` (whole decision) explicitly
-  nulls `SelectedOptionId` first — belt and suspenders for the InMemory provider.
 - Analytics KPI text renders without an inner space (label+number concatenation);
   a deliberate cosmetic tradeoff.
+- Dashboard month-axis labels include a two-digit year (`Mar '26`) via `Point.year` —
+  keeps Jan/Apr across year boundaries unambiguous; tooltips already showed full dates.
 
 ## Tradeoffs / future work
 

@@ -667,16 +667,19 @@ export class DecisionDetailComponent {
   }
 
   async removeOption(d: DecisionDto, optionId: number): Promise<void> {
+    if (!confirm('Delete this option?')) return;
     await this.run(() => this.api.deleteOption(d.id, optionId).toPromise());
     await this.load();
   }
 
   async removeReason(d: DecisionDto, reasonId: number): Promise<void> {
+    if (!confirm('Delete this reason?')) return;
     await this.run(() => this.api.deleteReason(d.id, reasonId).toPromise());
     await this.load();
   }
 
   async doDelete(d: DecisionDto): Promise<void> {
+    if (!confirm(`Delete "${d.title}" permanently? Its options, reasons, and review are removed too.`)) return;
     const ok = await this.run(() => this.api.deleteDecision(d.id).toPromise());
     if (ok !== undefined) await this.router.navigate(['/decisions']);
   }

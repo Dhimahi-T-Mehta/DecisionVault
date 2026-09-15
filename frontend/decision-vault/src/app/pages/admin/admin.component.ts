@@ -6,6 +6,7 @@ import { ApiService } from '../../core/api.service';
 import {
   CATEGORY_KINDS, ActivityDto, AdminDashboardDto, AdminUserDto, CategoryDto, CategoryUpsert, PagedResult
 } from '../../core/models';
+import { AuthService } from '../../core/auth.service';
 import { ApiClientError } from '../../core/api';
 
 @Component({
@@ -82,9 +83,9 @@ import { ApiClientError } from '../../core/api';
             <label>Description<input formControlName="description" placeholder="What belongs here?" /></label>
             <label>Kind *
               <select formControlName="kind">
-                <option value="Standard">Standard</option>
-                <option value="Recurring">Recurring</option>
-                <option value="OneTime">One time</option>
+                @for (k of kinds; track k) {
+                  <option [value]="k">{{ k }}</option>
+                }
               </select>
             </label>
             <div class="row-actions">
@@ -185,6 +186,9 @@ import { ApiClientError } from '../../core/api';
 export class AdminComponent {
   private readonly fb = inject(FormBuilder);
   private readonly api = inject(ApiService);
+  private readonly auth = inject(AuthService);
+
+  readonly currentUserId = () => this.auth.user()?.id ?? -1;
 
   readonly tab = signal<'users' | 'categories' | 'activity'>('users');
   readonly error = signal<string | null>(null);
@@ -262,12 +266,18 @@ export class AdminComponent {
   goActivity(p: number): void { this.actPage.set(p); void this.loadActivity(); }
 
   async toggleActive(u: AdminUserDto): Promise<void> {
+    const verb = u.isActive ? 'deactivate' : 'reactivate';
+    if (u.id === this.currentUserId() && !confirm(`${verb} your own account? You will be signed out immediately.`)) return;
+    if (u.id !== this.currentUserId() && !confirm(`${verb} ${u.fullName}?`)) return;
     await this.guard(() => this.api.setUserActive(u.id, !u.isActive).toPromise());
     await this.loadUsers();
+    await this.loadStats();
   }
 
   async changeRole(u: AdminUserDto): Promise<void> {
     const next = u.role === 'Admin' ? 'User' : 'Admin';
+    if (u.id === this.currentUserId() && !confirm(`Demote yourself to User? You will lose admin access immediately.`)) return;
+    if (u.id !== this.currentUserId() && !confirm(`Make ${u.fullName} ${next === 'Admin' ? 'an admin' : 'a regular user'}?`)) return;
     await this.guard(() => this.api.setUserRole(u.id, next).toPromise());
     await this.loadUsers();
   }
@@ -287,11 +297,12 @@ export class AdminComponent {
     const body: CategoryUpsert = { name: v.name, description: v.description || null, kind: v.kind };
     const id = this.editingCategory();
     await this.guard(async () => id ? this.api.updateCategory(id, body).toPromise() : this.api.createCategory(body).toPromise());
-    this.cancelCategoryEdit();
+    if (id) this.cancelCategoryEdit();
     await this.loadCategories();
   }
 
   async deleteCategory(c: CategoryDto): Promise<void> {
+    if (!confirm(`Delete category "${c.name}"? Decisions in it must be moved first.`)) return;
     await this.guard(() => this.api.deleteCategory(c.id).toPromise());
     if (this.editingCategory() === c.id) this.cancelCategoryEdit();
     await this.loadCategories();

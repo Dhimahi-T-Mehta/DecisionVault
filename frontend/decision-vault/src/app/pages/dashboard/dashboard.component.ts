@@ -128,7 +128,7 @@ export class DashboardComponent {
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
 
-  readonly monthLabel = (p: Point) => `${MONTHS[(p.x - 1) % 12]}`;
+  readonly monthLabel = (p: Point) => `${MONTHS[(p.x - 1) % 12]} '${String(p.year).slice(2)}`;
 
   constructor() {
     void this.load();
@@ -169,7 +169,7 @@ export class DashboardComponent {
     return d.monthlyTrend
       .slice()
       .sort((a, b) => a.year * 12 + a.month - (b.year * 12 + b.month))
-      .map(t => ({ x: t.month, y: t.total, label: `${MONTHS[t.month - 1]} ${t.year}` }));
+      .map(t => ({ x: t.month, y: t.total, year: t.year, label: `${MONTHS[t.month - 1]} ${t.year}` }));
   }
 
   outcomeLabel(successful: boolean | null, rating: number | null): string {

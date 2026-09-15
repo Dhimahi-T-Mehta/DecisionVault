@@ -64,14 +64,16 @@ public class Decision : BaseEntity
 
     /// <summary>
     /// Forward-only lifecycle. Allowed moves: Draft→Evaluating, Evaluating→Decided,
-    /// Decided→InProgress, InProgress→ReadyForReview, plus re-open Evaluating→Decided... 
+    /// Decided→InProgress, InProgress→ReadyForReview. Re-open: Decided→Evaluating
+    /// (selection cleared by the service so the choice must be made again); back-step
+    /// Evaluating→Draft for abandoned evaluations. Reviewed is terminal.
     /// </summary>
     public static readonly IReadOnlyDictionary<DecisionStatus, DecisionStatus[]> AllowedTransitions =
         new Dictionary<DecisionStatus, DecisionStatus[]>
         {
             [DecisionStatus.Draft] = [DecisionStatus.Evaluating],
             [DecisionStatus.Evaluating] = [DecisionStatus.Decided, DecisionStatus.Draft],
-            [DecisionStatus.Decided] = [DecisionStatus.InProgress],
+            [DecisionStatus.Decided] = [DecisionStatus.InProgress, DecisionStatus.Evaluating],
             [DecisionStatus.InProgress] = [DecisionStatus.ReadyForReview],
             [DecisionStatus.ReadyForReview] = [DecisionStatus.Reviewed],
             [DecisionStatus.Reviewed] = []

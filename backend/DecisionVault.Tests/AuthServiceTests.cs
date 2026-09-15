@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
-using Moq;
 using DecisionVault.Application.DTOs;
 using DecisionVault.Application.Interfaces;
 using DecisionVault.Application.Services;
@@ -70,12 +69,6 @@ public sealed class FakeTokenService : IJwtTokenService
 {
     public (string Token, DateTime ExpiresAt) CreateToken(int userId, string email, string role) =>
         ($"token:{userId}:{role}", DateTime.UtcNow.AddHours(1));
-}
-
-/// <summary>Moq-based IRepository stub used to verify UnitOfWork/repository delegation.</summary>
-public static class RepoMoq
-{
-    public static Mock<IRepository<T>> Of<T>() where T : BaseEntity => new();
 }
 
 public class AuthServiceTests : IClassFixture<ServiceFixture>

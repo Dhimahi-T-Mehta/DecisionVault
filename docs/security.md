@@ -47,6 +47,19 @@
 - All inputs validated server-side (`DtoValidator`) — length/range checks plus email
   format; EF parameters prevent SQL injection (no raw SQL anywhere).
 
+## Data integrity (defense in depth)
+
+- Unique indexes back identity and domain rules: `users.Email` unique,
+  `(decision_id, name)` unique per decision (duplicate option names are rejected in
+  the service with a friendly 409; the index catches the race).
+- **CHECK constraints** (migration `AddCheckConstraints`) mirror `DtoValidator`
+  ranges at the DB level: `confidence_score` 1–100 and `ExpectedSuccessScore` 1–100
+  on `decisions`; `Score`/`Weight` 0–10 on `decision_options`. Verified live on
+  PostgreSQL — violating writes fail with SQLSTATE 23514.
+- `GlobalExceptionMiddleware` maps unique-index races (`PostgresException` 23505) to
+  `409 "A record with these details already exists."` instead of a 500.
+
+
 ## Error discipline
 
 - Auth failures are indistinguishable on purpose: bad email and wrong password both

@@ -71,8 +71,8 @@ public class AuthService(
         if (string.IsNullOrWhiteSpace(request.FullName) || request.FullName.Trim().Length < 2 || request.FullName.Length > 100)
             throw new Domain.Exceptions.ValidationException("Full name must be 2-100 characters.");
         var email = request.Email.Trim().ToLowerInvariant();
-        if (string.IsNullOrWhiteSpace(email) || email.Length > 255)
-            throw new Domain.Exceptions.ValidationException("A valid email is required.");
+        if (string.IsNullOrWhiteSpace(email) || !DtoValidator.EmailFormatIsValid(email))
+            throw new Domain.Exceptions.ValidationException("A valid email address is required.");
 
         var user = await uow.Users.QueryWhere(u => u.Id == userId, asNoTracking: false).FirstOrDefaultAsync(ct)
             ?? throw new NotFoundException("User not found.");

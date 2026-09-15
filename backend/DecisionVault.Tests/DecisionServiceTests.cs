@@ -94,12 +94,43 @@ public class DecisionServiceTests : IClassFixture<ServiceFixture>
     }
 
     [Fact]
+    public async Task Mutations_ByOtherUser_ThrowForbidden()
+    {
+        var svc = new DecisionService(_fx.NewUoW(), NullLogger<DecisionService>.Instance);
+        var dto = await svc.CreateAsync(_fx.DemoUser.Id,
+            new DecisionCreateRequest("Expect it", null, _fx.Career.Id, null, null, 70, 70, null));
+
+        await Assert.ThrowsAsync<ForbiddenException>(() =>
+            svc.UpdateAsync(dto.Id, _fx.AdminUser.Id,
+                new DecisionUpdateRequest("Hijacked", null, _fx.Career.Id, null, null, 70, 70, null)));
+        await Assert.ThrowsAsync<ForbiddenException>(() =>
+            svc.AddOptionAsync(dto.Id, _fx.AdminUser.Id, new DecisionOptionRequest("X", null, null, null, Score: 5, Weight: 5)));
+        await Assert.ThrowsAsync<ForbiddenException>(() => svc.DeleteAsync(dto.Id, _fx.AdminUser.Id));
+    }
+
+    [Fact]
+    public async Task Transition_DecidedToEvaluating_ClearsSelectedOption()
+    {
+        var svc = new DecisionService(_fx.NewUoW(), NullLogger<DecisionService>.Instance);
+        var d = SeedDecision(options: 2, status: DecisionStatus.Draft);
+        await svc.TransitionAsync(d.Id, _fx.DemoUser.Id, new TransitionRequest(DecisionStatus.Evaluating.ToString()));
+        var optionId = _fx.Db.DecisionOptions.Where(o => o.DecisionId == d.Id).First().Id;
+        await svc.SelectOptionAsync(d.Id, _fx.DemoUser.Id, new SelectOptionRequest(optionId)); // → Decided
+
+        // Re-open: back to Evaluating; the selection must not survive.
+        await svc.TransitionAsync(d.Id, _fx.DemoUser.Id, new TransitionRequest(DecisionStatus.Evaluating.ToString()));
+        var reloaded = await svc.GetByIdForUserAsync(d.Id, _fx.DemoUser.Id, isAdmin: false);
+        Assert.Equal(DecisionStatus.Evaluating.ToString(), reloaded.Status);
+        Assert.Null(reloaded.SelectedOptionId);
+    }
+
+
+    [Fact]
     public async Task Finalize_WithTwoOptions_TransitionsToDecided_AndSetsExpectations()
     {
         var svc = new DecisionService(_fx.NewUoW(), NullLogger<DecisionService>.Instance);
         var d = SeedDecision(options: 2);
         var optionId = _fx.Db.DecisionOptions.Where(o => o.DecisionId == d.Id).First().Id;
-
         var dto = await svc.FinalizeAsync(d.Id, _fx.DemoUser.Id, new FinalizeRequest(optionId, 72, 88, "Delivered on time"));
         Assert.Equal(DecisionStatus.Decided.ToString(), dto.Status);
         Assert.Equal(optionId, dto.SelectedOptionId);
@@ -220,5 +251,29 @@ public class DecisionServiceTests : IClassFixture<ServiceFixture>
         var d = SeedDecision();
         await Assert.ThrowsAsync<DecisionVault.Domain.Exceptions.ValidationException>(() =>
             svc.AddOptionAsync(d.Id, _fx.DemoUser.Id, new DecisionOptionRequest("Opt", null, null, null, Score: 42, Weight: 0)));
+    }
+
+
+    [Fact]
+    public async Task AddOption_DuplicateName_ThrowsConflict()
+    {
+        var svc = new DecisionService(_fx.NewUoW(), NullLogger<DecisionService>.Instance);
+        var d = SeedDecision(options: 1);
+        var ex = await Assert.ThrowsAsync<ConflictException>(() =>
+            svc.AddOptionAsync(d.Id, _fx.DemoUser.Id, new DecisionOptionRequest("option 1", null, null, null, Score: 5, Weight: 5)));
+        // Case-insensitive match against the unique (DecisionId, Name) index; 409 not 500.
+        Assert.Contains("already exists", ex.Message);
+    }
+
+    [Fact]
+    public async Task UpdateOption_RenameToSiblingName_ThrowsConflict()
+    {
+        var svc = new DecisionService(_fx.NewUoW(), NullLogger<DecisionService>.Instance);
+        var d = SeedDecision(options: 2);
+        var first = d.Options.First();
+        var ex = await Assert.ThrowsAsync<ConflictException>(() =>
+            svc.UpdateOptionAsync(d.Id, first.Id, _fx.DemoUser.Id,
+                new DecisionOptionRequest(d.Options.Last().Name, null, null, null, Score: 5, Weight: 5)));
+        Assert.Contains("already exists", ex.Message);
     }
 }

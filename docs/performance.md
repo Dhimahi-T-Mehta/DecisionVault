@@ -20,6 +20,9 @@
   combined with the status filter in the same query.
 - **Single commit per use case** via `UnitOfWork.SaveChangesAsync` — one transaction,
   decision + options + reasons + events atomically.
+- **Server-side pagination** on the decisions list: `page`/`pageSize` translate to
+  `Skip/Take` with a `totalCount`, executed against the composite index
+  `(UserId, Status, CreatedAt)`; verified page=1&pageSize=1 returns one item + total.
 
 ## Frontend
 
@@ -37,12 +40,10 @@
 | Login (BCrypt verify wf=11) | ~100 ms |
 | Decisions list (5 rows, filtered) | < 30 ms |
 | Dashboard summary (aggregates) | < 30 ms |
-| Full backend test suite (42 tests, InMemory) | < 1 s |
+| Full backend test suite (47 tests, InMemory) | < 1 s |
 | Angular production build | ~4.3 s |
 
 ## Scope boundaries (documented, not implemented)
 
-- **No pagination** on the decisions list — acceptable for single-user demo volumes
-  (dozens of rows); the composite index supports adding `OFFSET/FETCH` later.
 - No output caching; aggregates recompute per request.
 - No CDN/asset pipeline beyond the Angular build output.

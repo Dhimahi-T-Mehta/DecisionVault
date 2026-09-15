@@ -179,7 +179,14 @@ public static class DbSeeder
             Events =
             [
                 new() { EventType = "Created", Description = "Decision created", CreatedAt = DateTime.UtcNow.AddDays(-41) },
+                new() { EventType = "OptionAdded", Description = "Option 'Join the startup' added", CreatedAt = DateTime.UtcNow.AddDays(-40) },
+                new() { EventType = "OptionAdded", Description = "Option 'Stay corporate' added", CreatedAt = DateTime.UtcNow.AddDays(-40) },
+                new() { EventType = "OptionSelected", Description = "Option 'Join the startup' marked as intended choice", CreatedAt = DateTime.UtcNow.AddDays(-38) },
+                new() { EventType = "StatusChanged", Description = "Status changed to Decided", CreatedAt = DateTime.UtcNow.AddDays(-38) },
                 new() { EventType = "Finalized", Description = "Decision finalized with confidence and expected outcome", CreatedAt = DateTime.UtcNow.AddDays(-38) },
+                new() { EventType = "StatusChanged", Description = "Status changed to InProgress", CreatedAt = DateTime.UtcNow.AddDays(-30) },
+                new() { EventType = "StatusChanged", Description = "Status changed to ReadyForReview", CreatedAt = DateTime.UtcNow.AddDays(-10) },
+                new() { EventType = "StatusChanged", Description = "Status changed to Reviewed", CreatedAt = DateTime.UtcNow.AddDays(-8) },
                 new() { EventType = "Reviewed", Description = "Review recorded — outcome rated 4/5", CreatedAt = DateTime.UtcNow.AddDays(-8) }
             ]
         };
@@ -228,7 +235,14 @@ public static class DbSeeder
             Events =
             [
                 new() { EventType = "Created", Description = "Decision created", CreatedAt = DateTime.UtcNow.AddDays(-71) },
+                new() { EventType = "OptionAdded", Description = "Option 'MacBook Pro 14' added", CreatedAt = DateTime.UtcNow.AddDays(-70) },
+                new() { EventType = "OptionAdded", Description = "Option 'ThinkPad X1' added", CreatedAt = DateTime.UtcNow.AddDays(-70) },
+                new() { EventType = "OptionSelected", Description = "Option 'MacBook Pro 14' marked as intended choice", CreatedAt = DateTime.UtcNow.AddDays(-68) },
+                new() { EventType = "StatusChanged", Description = "Status changed to Decided", CreatedAt = DateTime.UtcNow.AddDays(-68) },
                 new() { EventType = "Finalized", Description = "Decision finalized with confidence and expected outcome", CreatedAt = DateTime.UtcNow.AddDays(-68) },
+                new() { EventType = "StatusChanged", Description = "Status changed to InProgress", CreatedAt = DateTime.UtcNow.AddDays(-50) },
+                new() { EventType = "StatusChanged", Description = "Status changed to ReadyForReview", CreatedAt = DateTime.UtcNow.AddDays(-30) },
+                new() { EventType = "StatusChanged", Description = "Status changed to Reviewed", CreatedAt = DateTime.UtcNow.AddDays(-25) },
                 new() { EventType = "Reviewed", Description = "Review recorded — outcome rated 2/5", CreatedAt = DateTime.UtcNow.AddDays(-25) }
             ]
         };

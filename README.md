@@ -17,7 +17,7 @@ layered architecture on both ends.
 | Backend    | ASP.NET Core 9 Web API, layered (Domain / Application / Infrastructure / API) |
 | Data       | PostgreSQL 17, EF Core 9 (Npgsql), code-first migrations |
 | Auth       | JWT bearer tokens, BCrypt password hashing, role-based authorization (`Admin` / `User`) |
-| Tests      | xUnit + Moq + EF Core InMemory (backend, 42 tests), Karma + Jasmine (frontend, 15 tests) |
+| Tests      | xUnit + EF Core InMemory (backend, 47 tests), Karma + Jasmine (frontend, 15 tests) |
 
 ## Architecture
 
@@ -77,7 +77,7 @@ Prerequisites: .NET SDK 9, Node 22, Docker (for PostgreSQL).
 ## Testing
 
 ```bash
-# Backend — 42 tests
+# Backend — 47 tests
 cd backend && dotnet test
 
 # Frontend — 15 tests (ChromeHeadless)

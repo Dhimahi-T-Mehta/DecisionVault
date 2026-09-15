@@ -5,7 +5,7 @@ using DecisionVault.Domain.Exceptions;
 
 namespace DecisionVault.Tests;
 
-/// <summary>Forward-only lifecycle rules on the Decision entity.</summary>
+/// <summary>Lifecycle rules on the Decision entity: forward-only core plus the Decided→Evaluating re-open.</summary>
 public class DecisionLifecycleTests
 {
     [Theory]
@@ -17,7 +17,7 @@ public class DecisionLifecycleTests
     [InlineData(DecisionStatus.ReadyForReview, DecisionStatus.Reviewed, true)]
     [InlineData(DecisionStatus.Draft, DecisionStatus.Decided, false)]
     [InlineData(DecisionStatus.Draft, DecisionStatus.Reviewed, false)]
-    [InlineData(DecisionStatus.Decided, DecisionStatus.Evaluating, false)]
+    [InlineData(DecisionStatus.Decided, DecisionStatus.Evaluating, true)]
     [InlineData(DecisionStatus.Decided, DecisionStatus.Reviewed, false)]
     [InlineData(DecisionStatus.Reviewed, DecisionStatus.Draft, false)]
     [InlineData(DecisionStatus.Reviewed, DecisionStatus.Reviewed, false)]
@@ -36,6 +36,14 @@ public class DecisionLifecycleTests
             if (target == DecisionStatus.Reviewed) continue;
             Assert.False(decision.CanTransitionTo(target));
         }
+    }
+
+    [Fact]
+    public void Decided_To_Evaluating_Reopen_IsAllowed()
+    {
+        // The UI offers "Re-evaluate" on Decided; the service clears the selected option.
+        var decision = new Decision { Status = DecisionStatus.Decided, SelectedOptionId = 7 };
+        Assert.True(decision.CanTransitionTo(DecisionStatus.Evaluating));
     }
 }
 
