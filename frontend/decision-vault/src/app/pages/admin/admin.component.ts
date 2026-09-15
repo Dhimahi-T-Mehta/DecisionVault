@@ -154,7 +154,7 @@ import { ApiClientError } from '../../core/api';
     .tabs { display: flex; gap: 6px; margin-bottom: 16px; }
     .tabs button { background: none; border: 1px solid transparent; color: var(--text-dim, #93a1b8); padding: 8px 16px; border-radius: 9px; font-size: 13.5px; cursor: pointer; }
     .tabs button.on { background: var(--surface-1, #0e1626); border-color: rgba(147,161,184,0.2); color: #f0b429; font-weight: 600; }
-    .card { background: var(--surface-1, #0e1626); border: 1px solid rgba(147,161,184,0.12); border-radius: 12px; padding: 18px; }
+    .card { background: var(--surface-1, #0e1626); border: 1px solid rgba(147,161,184,0.12); border-radius: 12px; padding: 18px; overflow-x: auto; }
     .card h2 { margin: 0 0 12px; font-size: 13px; color: var(--text-dim, #93a1b8); text-transform: uppercase; letter-spacing: 0.06em; }
     .card-head { margin-bottom: 10px; }
     input[type='search'] { width: 100%; max-width: 320px; background: var(--surface-2, #16213a); border: 1px solid rgba(147,161,184,0.2); color: var(--text, #e8ecf4); border-radius: 9px; padding: 9px 11px; font-size: 13.5px; outline: none; }

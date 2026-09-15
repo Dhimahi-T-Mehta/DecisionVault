@@ -47,6 +47,9 @@ before changing shared code.
   `~/.local/bin/google-chrome`). End-to-end HTTP journey lives in `/tmp/e2e.sh` during
   dev; API-level negative scenarios (dup option 409, skip transition 409, double review 409)
   are also asserted there.
+- **Accessibility pass**: global `:focus-visible { outline: 2px solid var(--accent) }`
+  ring in `styles.scss` (UA default focus is near-invisible on the navy theme);
+  verified by keyboard-tabbing through the sidebar in a real browser.
 
 - Deleting an option referenced as `SelectedOptionId` is handled two ways: the FK is
   `ON DELETE SET NULL`, and the service explicitly nulls it on re-open — belt and
@@ -67,6 +70,8 @@ before changing shared code.
   a deliberate cosmetic tradeoff.
 - Dashboard month-axis labels include a two-digit year (`Mar '26`) via `Point.year` —
   keeps Jan/Apr across year boundaries unambiguous; tooltips already showed full dates.
+- Responsive pass at 1920/768/390 px: `overflow-x: auto` on the admin `.card` keeps
+  the users table inside the viewport on phones (rows scroll, page doesn't).
 
 ## Tradeoffs / future work
 

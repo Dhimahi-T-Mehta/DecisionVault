@@ -54,7 +54,10 @@ import { CategoryDto, DECISION_STATUSES, DecisionListItemDto, PagedResult } from
     } @else if (items().length === 0) {
       <div class="card empty-state">
         <p>No decisions match these filters.</p>
-        <a routerLink="/decisions/new" class="btn ghost small">Create one</a>
+        <div class="row-actions">
+          <button type="button" class="btn ghost small" (click)="clearFilters()">Clear filters</button>
+          <a routerLink="/decisions/new" class="btn ghost small">Create one</a>
+        </div>
       </div>
     } @else {
       <div class="card table-card">
@@ -109,6 +112,7 @@ import { CategoryDto, DECISION_STATUSES, DecisionListItemDto, PagedResult } from
     .pill[data-status='Decided'], .pill[data-status='InProgress'] { background: rgba(91,141,239,0.15); color: #5b8def; }
     .pill[data-status='ReadyForReview'] { background: rgba(240,180,41,0.15); color: #f0b429; }
     .pager { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 16px; color: var(--text-dim, #93a1b8); font-size: 13px; }
+    .row-actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
     .empty-state { padding: 40px; text-align: center; color: var(--text-dim, #93a1b8); }
     .alert { background: rgba(229,115,115,0.12); border: 1px solid rgba(229,115,115,0.4); color: #f1a1a1; border-radius: 9px; padding: 10px 12px; font-size: 13px; margin-bottom: 16px; display: flex; gap: 12px; align-items: center; }
     .skeleton { position: relative; overflow: hidden; background: var(--surface-2, #16213a); }
@@ -179,6 +183,10 @@ export class DecisionsListComponent {
     } finally {
       this.loading.set(false);
     }
+  }
+
+  clearFilters(): void {
+    this.filters.reset({ search: '', categoryId: null, status: null, outcome: null, sortBy: 'CreatedAt' });
   }
 
   go(p: number): void {

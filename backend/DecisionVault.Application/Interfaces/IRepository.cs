@@ -2,7 +2,6 @@ using DecisionVault.Domain.Entities;
 using System.Linq.Expressions;
 using DecisionVault.Domain;
 
-using DecisionVault.Domain.Entities;
 namespace DecisionVault.Application.Interfaces;
 
 public interface IRepository<T> where T : BaseEntity

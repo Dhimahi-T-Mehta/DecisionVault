@@ -58,6 +58,10 @@
   PostgreSQL — violating writes fail with SQLSTATE 23514.
 - `GlobalExceptionMiddleware` maps unique-index races (`PostgresException` 23505) to
   `409 "A record with these details already exists."` instead of a 500.
+- Smoke-verified in the release pass: no/invalid/tampered tokens → 401; user hitting
+  admin endpoints → 403; cross-user read/modify/delete → 403; invalid transitions,
+  duplicate options, and double reviews → 409; error envelope never leaks stack
+  traces or SQL details.
 
 
 ## Error discipline
