@@ -2,9 +2,7 @@
 
 ## Query strategy
 
-- **No-tracking reads.** `Repository.QueryWhere(asNoTracking: true)` (default for
-  list/dashboard/analytics paths) skips change-tracker overhead; tracking is enabled
-  only for mutations.
+- **No-tracking reads.** List, dashboard, and analytics queries normally call `Repository.QueryWhere(asNoTracking: true)`, which avoids change-tracker work. Tracking is used for mutations.
 - **Composite indexes** (EF migration `InitialCreate`):
   - `decisions (UserId, Status, CreatedAt)` — the decisions list filter + sort
   - `decisions (UserId, CategoryId)` and `(UserId, ReviewDate)` — dashboard/analytics groupings
@@ -12,17 +10,11 @@
     detail loads in event order
   - unique index `users.Name` (email uniqueness) and FK indexes `CategoryId`,
     `SelectedOptionId`
-- **Detail loads in one round trip** — `Include(Category/Options/Reasons/Review/SelectedOption)`
-  instead of lazy-loading N+1s.
-- **Server-side aggregation.** Dashboard/analytics `GroupBy` executes in PostgreSQL
-  (rows grouped before materialization); only aggregates cross the wire, not raw rows.
-- **Search** is a case-insensitive title `Contains` translated to SQL `ILIKE`,
-  combined with the status filter in the same query.
-- **Single commit per use case** via `UnitOfWork.SaveChangesAsync` — one transaction,
-  decision + options + reasons + events atomically.
-- **Server-side pagination** on the decisions list: `page`/`pageSize` translate to
-  `Skip/Take` with a `totalCount`, executed against the composite index
-  `(UserId, Status, CreatedAt)`; verified page=1&pageSize=1 returns one item + total.
+- **Detail loads use one round trip.** `Include(Category/Options/Reasons/Review/SelectedOption)` loads the related data together instead of relying on lazy loading and creating N+1 queries.
+- **Server-side aggregation.** Dashboard and analytics `GroupBy` operations run in PostgreSQL. Only the aggregated results are returned to the application.
+- **Search** checks the title case-insensitively. EF Core translates the `Contains` query to SQL `ILIKE`, and the status filter is applied in the same query.
+- **Single commit per use case.** `UnitOfWork.SaveChangesAsync` commits the decision, options, reasons, and events together in one transaction.
+- **Server-side pagination.** `page` and `pageSize` become `Skip/Take` operations and are sent with `totalCount`. The query uses `(UserId, Status, CreatedAt)`. The setup was checked with `page=1&pageSize=1`, which returned one item and the total count.
 
 ## Frontend
 
@@ -33,7 +25,7 @@
 - Production build (`npx ng build`) outputs hashed, minified bundles; the dev server
   hot-reloads during development.
 
-## Measured (dev box)
+## Measurements from the development machine
 
 | Operation | Latency |
 |---|---|
@@ -43,7 +35,7 @@
 | Full backend test suite (47 tests, InMemory) | < 1 s |
 | Angular production build | ~4.3 s |
 
-## Scope boundaries (documented, not implemented)
+## Scope boundaries
 
 - No output caching; aggregates recompute per request.
 - No CDN/asset pipeline beyond the Angular build output.

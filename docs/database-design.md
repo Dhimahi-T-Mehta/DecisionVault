@@ -1,10 +1,6 @@
 # Database Design
 
-PostgreSQL 17, EF Core 9 code-first, single migration `InitialCreate`.
-All application tables live in schema **`decision_vault`**
-(`modelBuilder.HasDefaultSchema("decision_vault")`). Migrations apply automatically
-at API startup (`DbSeeder.SeedAsync → Database.MigrateAsync()`), followed by optional
-demo seeding (`SeedDemoData` flag).
+PostgreSQL 17 is used with EF Core 9 code-first. The application tables are kept in the **`decision_vault`** schema (`modelBuilder.HasDefaultSchema("decision_vault")`). The API applies migrations during startup through `DbSeeder.SeedAsync → Database.MigrateAsync()`, then optionally seeds demo data when `SeedDemoData` is enabled.
 
 ## Entity-relationship overview
 
@@ -105,12 +101,9 @@ users 1───* decisions *───1 categories
 
 ## Query patterns
 
-- Decision list: filtered by owner (or all for admin), optional `status` and `search`
-  (title contains, case-insensitive), ordered by `CreatedAt DESC`.
-- Detail loads use `Include(Options).Include(Reasons).Include(Review).Include(Category)`
-  in one round trip.
-- Dashboard/analytics aggregates use server-side `GroupBy` (rows grouped before
-  materialization) — category breakdowns, success rate, average outcome rating.
+- Decision list: filtered by owner (or all for admin), with optional `status` and `search` filters. Search checks the title case-insensitively, and results are ordered by `CreatedAt DESC`.
+- Detail loads use `Include(Options).Include(Reasons).Include(Review).Include(Category)` so the related data is fetched in one round trip.
+- Dashboard and analytics totals use server-side `GroupBy`. PostgreSQL performs the grouping before the rows are materialized, including category counts, success rate, and average outcome rating.
 
 ## Verification
 

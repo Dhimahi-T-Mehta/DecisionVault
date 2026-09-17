@@ -1,6 +1,6 @@
 # DecisionVault — API Contract (v1)
 
-Single source of truth for backend controllers and Angular services. All endpoints under `/api`.
+This file is the API contract used by the backend controllers and Angular services. All endpoints are under `/api`.
 **Rules:**
 - Auth: `Authorization: Bearer <jwt>` except `/auth/register`, `/auth/login`.
 - Envelope: success responses return the DTO directly. Errors return `ApiError`:

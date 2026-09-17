@@ -1,7 +1,6 @@
 # API Documentation
 
-Interactive reference: **Swagger UI at `http://localhost:5000/swagger`** (enabled in
-Development). The machine-readable contract lives in `docs/api-contract.md`.
+Use **Swagger UI at `http://localhost:5000/swagger`** for the interactive API reference in development. The detailed request and response contract is kept in `docs/api-contract.md`.
 
 ## Base URL & CORS
 
@@ -11,18 +10,15 @@ Development). The machine-readable contract lives in `docs/api-contract.md`.
 
 ## Authentication flow
 
-1. `POST /api/auth/register` or `POST /api/auth/login` → `AuthResponse { token, expiresAt, user }`.
-2. Client stores token (localStorage) and sends `Authorization: Bearer <jwt>` on every
-   API call (attached automatically by `authInterceptor`).
-3. Tokens are HS256-signed, 120-minute expiry, issuer `DecisionVault.API`,
-   audience `DecisionVault.Client`. Claims: `sub` (user id), `email`, `role`.
-4. A `401` mid-session triggers client-side session clearing and redirect to
-   `/login?expired=1`.
+1. `POST /api/auth/register` or `POST /api/auth/login` returns `AuthResponse { token, expiresAt, user }`.
+2. The client stores the token in localStorage and sends `Authorization: Bearer <jwt>` with API calls. `authInterceptor` adds the header automatically.
+3. Tokens use HS256 and contain the `sub` (user id), `email`, and `role` claims. The issuer is `DecisionVault.API`, the audience is `DecisionVault.Client`, and the expiry is 120 minutes.
+4. If an API call returns `401` while the user is signed in, the client clears the session and redirects to `/login?expired=1`.
 
 ## Response conventions
 
-- **Success**: the DTO directly (`200`/`201`), or `204` for deletes. No wrapping envelope.
-- **Error**: uniform envelope from exception middleware:
+- **Success**: the API returns the DTO directly for `200`/`201`, or `204` for deletes. Successful responses are not wrapped in an envelope.
+- **Error**: the exception middleware returns the same error envelope for all handled errors:
 
 ```json
 {
@@ -56,9 +52,9 @@ Development). The machine-readable contract lives in `docs/api-contract.md`.
 | Profile | `GET /profile/summary` |
 | Admin | `GET /admin/users`, `PUT /admin/users/{id}/active`, `PUT /admin/users/{id}/role`, `GET /admin/stats` |
 
-Full request/response shapes: `docs/api-contract.md`.
+For complete request and response shapes, see `docs/api-contract.md`.
 
-## Trying it with curl
+## Try the API with curl
 
 ```bash
 # 1. Login

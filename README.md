@@ -8,21 +8,15 @@
 
 **Decision Intelligence & Outcome Tracking Platform**
 
-A full-stack web application for making decisions deliberately and learning from them:
-record an important decision, preserve the alternatives and reasoning, commit with an
-explicit confidence level, execute, then review what actually happened. The platform
-scores how well reality matched expectations and aggregates lifetime decision quality
-into dashboard and analytics views.
+A full-stack web application for keeping a record of important decisions and checking the results later. A decision stores the alternatives, reasoning, confidence level, expected outcome, and final result. After the decision is reviewed, the application compares the expected and actual outcome and shows the results in the dashboard and analytics views.
 
-> DecisionVault was developed by Dhimahi Mehta as an internship/academic project to
-> apply the technologies and concepts learned during the TatvaSoft Summer Internship
-> Program 2026. It is not commissioned, deployed, or endorsed by TatvaSoft.
+> DecisionVault was developed by Dhimahi Mehta as an internship/academic project while applying the technologies and concepts covered during the TatvaSoft Summer Internship Program 2026. It is not commissioned, deployed, or endorsed by TatvaSoft.
 
 ---
 
 ## About the Project
 
-People make important decisions but rarely preserve the thinking behind them:
+Most decision records focus on the final choice and leave out the reasoning behind it. DecisionVault keeps those details together:
 
 - alternatives considered
 - reasoning (pros / cons / notes)
@@ -31,9 +25,7 @@ People make important decisions but rarely preserve the thinking behind them:
 - actual outcomes
 - lessons learned
 
-DecisionVault turns each decision into a structured record with a validated lifecycle,
-then closes the loop with reviews and analytics so the historical record becomes usable
-feedback.
+Each decision is stored as a structured record and moves through a fixed lifecycle. A later review adds the actual result, and the dashboard and analytics use that history to show how decisions turned out.
 
 **Core lifecycle:** `THINK → DECIDE → RECORD → EXECUTE → REVIEW → LEARN`
 
@@ -49,19 +41,13 @@ feedback.
 | **Duration** | 15 days |
 | **Technology focus** | PostgreSQL, Angular, .NET Core |
 
-The internship covered practical work across .NET Core Web API, Angular components,
-data binding, reactive forms, routing, RxJS, ASP.NET Core middleware, dependency
-injection, validation, exception handling, EF Core, LINQ, Repository Pattern,
-Unit of Work, clean code, authentication, authorization, advanced PostgreSQL and
-query performance — all applied in this project.
+During the internship, I worked with .NET Core Web API, Angular components, data binding, reactive forms, routing, RxJS, ASP.NET Core middleware, dependency injection, validation, exception handling, EF Core, LINQ, the Repository Pattern, Unit of Work, authentication, authorization, PostgreSQL, and query performance. These topics were used directly while building DecisionVault.
 
 ---
 
 ## 15-Day Development Timeline
 
-DecisionVault was developed through an incremental 15-day development plan, progressing
-from backend and database foundations to frontend implementation, testing, security,
-documentation, and final release preparation.
+The project was built over a 15-day plan. The work started with the backend and database, then moved to the Angular frontend, testing, security checks, documentation, and final cleanup.
 
 | Day | Development Focus |
 |---|---|
@@ -179,9 +165,7 @@ Backend layers (clean architecture):
 | `DecisionVault.API` | Controllers, middleware, CORS, Swagger, seeding |
 | `DecisionVault.Tests` | xUnit suite (lifecycle, metrics, auth, decisions, admin) |
 
-Cross-cutting: typed exceptions mapped to HTTP by a global exception middleware
-(`{success, message, errors[], timestamp}` envelope), enums serialized as strings,
-ownership enforced in the service layer.
+Across the application, typed exceptions are converted to HTTP responses by the global exception middleware. Errors use the `{success, message, errors[], timestamp}` format, enums are serialized as strings, and decision ownership is checked in the service layer.
 
 ---
 
@@ -228,7 +212,7 @@ Optional: pgAdmin 4 (GUI for PostgreSQL), VS Code / Visual Studio 2022 (≥ 17.1
 ### 2. Clone
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/Dhimahi-T-Mehta/DecisionVault
 cd DecisionVault
 ```
 
@@ -252,11 +236,7 @@ and note the `postgres` password. Then either
 
 ### 4. Configure the backend
 
-Development settings live in `backend/DecisionVault.API/appsettings.Development.json`
-(connection string, dev JWT secret, `SeedDemoData=true`). For any other environment,
-copy `.env.example` values into `appsettings.{Environment}.json` or set environment
-variables (`ConnectionStrings__DecisionVault`, `Jwt__Secret`, …). **Never commit real
-secrets.**
+Development settings are kept in `backend/DecisionVault.API/appsettings.Development.json` (connection string, development JWT secret, and `SeedDemoData=true`). For another environment, use `.env.example` as the reference and set the values through `appsettings.{Environment}.json` or environment variables (`ConnectionStrings__DecisionVault`, `Jwt__Secret`, …). **Never commit real secrets.**
 
 ### 5. Start the backend (terminal 1)
 
@@ -267,9 +247,7 @@ dotnet build
 dotnet run --urls http://localhost:5000
 ```
 
-On startup the app **applies EF Core migrations automatically and seeds demo data**
-(when `SeedDemoData=true`) — no manual migration step is needed. `dotnet ef database
-update` is only required if you prefer to migrate explicitly:
+When the API starts, it applies the EF Core migrations automatically. If `SeedDemoData=true`, it also creates the demo data. There is no separate migration step for the normal development setup. You can still run `dotnet ef database update` yourself if you prefer to handle migrations manually:
 
 ```bash
 dotnet tool install --global dotnet-ef
@@ -296,16 +274,14 @@ npm start          # → http://localhost:4200
 
 ## Demo Accounts (development only)
 
-Created on first run when `SeedDemoData=true` (development default). **These are
-development/demo credentials only.**
+These accounts are created on the first run when `SeedDemoData=true`. They are for development and demo use only.
 
 | Role | Email | Password |
 |---|---|---|
 | Demo user | `demo@example.com` | `Demo#12345` |
 | Admin | `admin@example.com` | `Admin#12345` |
 
-The demo user comes with 5 sample decisions (with options, reasons, reviews and a full
-event timeline) so the dashboard and analytics are populated immediately.
+The demo user is seeded with 5 sample decisions, including options, reasons, reviews, and timeline events. This gives the dashboard and analytics some data to work with after the first run.
 
 ---
 
@@ -331,9 +307,7 @@ ER details: [`docs/database-design.md`](docs/database-design.md).
 
 ## API
 
-REST API under `/api`, documented live via Swagger at
-**http://localhost:5000/swagger** (development). Error responses use a consistent
-envelope: `{ "success": false, "message": "...", "errors": [...], "timestamp": "..." }`.
+The REST API is under `/api`. In development, Swagger is available at **http://localhost:5000/swagger**. API errors use the same envelope: `{ "success": false, "message": "...", "errors": [...], "timestamp": "..." }`.
 
 Major endpoint groups (all inspected in `DecisionVault.API/Controllers/`):
 
@@ -355,7 +329,7 @@ Full contract: [`docs/api-contract.md`](docs/api-contract.md).
 
 ## Testing
 
-Latest verified results:
+Latest test results:
 
 | Suite | Result |
 |---|---|
@@ -376,11 +350,7 @@ bash scripts/e2e-journey.sh
 bash scripts/security-smoke.sh
 ```
 
-Coverage: authentication (registration/login/password rules, uniform auth-failure
-message), authorization (roles, cross-user isolation), decision CRUD, the full
-lifecycle state machine (allowed and disallowed transitions incl. re-open),
-finalize/review gating and scoring math, duplicate-option conflicts, dashboard,
-analytics, profile, pagination, and error handling.
+The tests cover registration and login, password validation, the common authentication-failure response, role checks, cross-user isolation, decision CRUD, the full lifecycle state machine including re-opening a decision, finalize/review rules and scoring, duplicate-option conflicts, dashboard and analytics data, profile data, pagination, and error handling.
 
 ---
 
@@ -436,7 +406,7 @@ rendered below.
 
 ## Known Limitations
 
-Scope/tradeoff information, stated honestly:
+The current scope has a few known tradeoffs:
 
 - JWT lives in `localStorage`; no refresh-token or server-side revocation flow yet
   (expiry-based sessions only).
@@ -456,13 +426,11 @@ Scope/tradeoff information, stated honestly:
 **Dhimahi Mehta**
 Final Year, B.E. Information Technology
 
-DecisionVault was developed as an internship/academic project to apply full-stack
-development concepts learned during the TatvaSoft Summer Internship Program 2026.
+DecisionVault was built as an internship/academic project to put the full-stack development topics from the TatvaSoft Summer Internship Program 2026 into practice.
 
 ## Acknowledgement
 
-This project was developed as part of the learning and practical application
-associated with the TatvaSoft Summer Internship Program 2026.
+This project was developed as part of the learning and practical work completed during the TatvaSoft Summer Internship Program 2026.
 
 ## License
 

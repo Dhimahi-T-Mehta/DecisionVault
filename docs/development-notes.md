@@ -1,22 +1,16 @@
 # Development Notes
 
-Conventions, tradeoffs and quirks learned while building DecisionVault. Read this
-before changing shared code.
+These are the conventions, tradeoffs, and small quirks found while building DecisionVault. Check this file before changing shared code.
 
 ## Conventions
 
-- **Contract first.** `docs/api-contract.md` is the single source of truth. Change the
-  contract, then backend DTOs, then `core/models.ts` — in that order. Both sides
-  serialize enums as strings.
-- **Error envelope everywhere.** Services throw typed exceptions
-  (`ValidationException`, `NotFoundException`, `ConflictException`, `ForbiddenException`,
-  `UnauthorizedException`); only middleware maps them to HTTP. Controllers stay thin.
-- **One `SaveChangesAsync` per use case** through `IUnitOfWork`.
-- **Frontend naming**: signals (`token()`, `user()`, `isAdmin`), functional
-  guards/interceptor, standalone components, DTO interfaces mirroring the contract.
+- **Contract first.** `docs/api-contract.md` is the source of truth. If the contract changes, update the backend DTOs first and then `core/models.ts`. Both sides use string enums.
+- **One error format.** Services throw typed exceptions (`ValidationException`, `NotFoundException`, `ConflictException`, `ForbiddenException`, `UnauthorizedException`). The middleware converts them to HTTP responses, so controllers stay small.
+- **One `SaveChangesAsync` per use case.** Changes are committed through `IUnitOfWork`.
+- **Frontend conventions**: use signals (`token()`, `user()`, `isAdmin`), functional guards/interceptor, standalone components, and DTO interfaces that mirror the API contract.
 - Git identity for this project: `DecisionVault Dev <student@example.com>`.
 
-## Tooling gotchas (this workspace)
+## Tooling notes from this workspace
 
 - `dotnet` is user-local. Before any dotnet command:
   ```bash
@@ -26,8 +20,7 @@ before changing shared code.
 - PostgreSQL runs in Docker on **host port 5433** (container 5432):
   `docker exec decisionvault-pg psql -U postgres -d decisionvault -c '...'`.
   Always schema-qualify with `decision_vault`.
-- Long-running processes (API, ng serve) are supervised via the session hub
-  (`decisionvault-api`, `decisionvault-web`), not backgrounded shells.
+- Long-running processes such as the API and `ng serve` are run through the session hub (`decisionvault-api`, `decisionvault-web`) instead of backgrounded shells.
 
 ## Testing notes
 

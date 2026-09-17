@@ -2,8 +2,7 @@
 
 ## Overview
 
-DecisionVault uses a four-layer backend and a feature-folder Angular SPA. Every
-cross-boundary exchange is DTO-typed; entities never leave the Application layer.
+The backend is split into four layers, while the Angular app is organized by feature. Data crossing a layer boundary is represented by DTOs; domain entities are not exposed outside the Application layer.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -35,38 +34,25 @@ cross-boundary exchange is DTO-typed; entities never leave the Application layer
 
 ## Request flow
 
-1. Angular service calls `HttpClient`; `authInterceptor` attaches `Authorization: Bearer` for API-origin URLs only and maps error envelopes to `ApiClientError`.
-2. Controller validates route/model binding, delegates to a service, returns the DTO directly (`200`/`201`/`204`).
-3. Service enforces authorization context (`ICurrentUser`), runs `DtoValidator`, orchestrates Repository/UoW, appends `DecisionEvent` audit rows, commits once via `UnitOfWork.SaveChangesAsync`.
-4. On exception, middleware converts `ValidationException → 400`, `NotFoundException → 404`, `ConflictException → 409`, `ForbiddenException → 403`, `UnauthorizedException → 401` into the error envelope.
+1. An Angular service calls `HttpClient`. `authInterceptor` adds `Authorization: Bearer` only for API-origin URLs and converts API error envelopes to `ApiClientError`.
+2. The controller handles route/model binding, passes the request to the service, and returns the DTO directly with `200`, `201`, or `204`.
+3. The service checks the current user through `ICurrentUser`, runs `DtoValidator`, coordinates the Repository/Unit of Work, adds the relevant `DecisionEvent` rows, and commits once with `UnitOfWork.SaveChangesAsync`.
+4. If an exception reaches the middleware, it is mapped to the corresponding HTTP status: `ValidationException → 400`, `NotFoundException → 404`, `ConflictException → 409`, `ForbiddenException → 403`, and `UnauthorizedException → 401`.
 
 ## Backend patterns
 
-- **Repository + Unit of Work.** `Repository<T>` wraps `DbSet<T>` with tracked and
-  `AsNoTracking` query helpers; `UnitOfWork` exposes typed repositories and a single
-  `SaveChangesAsync`. Services depend only on `IUnitOfWork` — one transaction per use case.
-- **Service layer owns rules.** The decision state machine
-  (`Decision.AllowedTransitions`), finalize/review gating, metric computation, and
-  admin self-demotion guard all live in services or domain types — never in controllers.
-- **Domain purity.** `DecisionVault.Domain` has zero package references; metrics are
-  pure static functions, trivially unit-testable.
-- **Exceptions as control flow at the boundary.** Typed domain exceptions carry HTTP
-  semantics; middleware is the single mapping point.
-- **Audit events.** Every meaningful mutation (`Created`, `OptionAdded`,
-  `ReasonAdded`, `OptionSelected`, `StatusChanged`, `Finalized`, `Reviewed`)
-  appends an immutable `DecisionEvent` row.
+- **Repository + Unit of Work.** `Repository<T>` wraps `DbSet<T>` and provides tracked and `AsNoTracking` query helpers. `UnitOfWork` exposes the typed repositories and one `SaveChangesAsync`. Services depend on `IUnitOfWork`, with one transaction for each use case.
+- **Business rules stay out of controllers.** The decision state machine (`Decision.AllowedTransitions`), finalize/review checks, metric calculations, and the admin self-demotion guard are implemented in services or domain types.
+- **Domain purity.** `DecisionVault.Domain` has no package references. The metric functions are static and can be tested without infrastructure code.
+- **Exceptions at the API boundary.** Typed exceptions carry the information needed for an HTTP response, and the middleware is the only place that maps them to status codes.
+- **Audit events.** Meaningful changes such as `Created`, `OptionAdded`, `ReasonAdded`, `OptionSelected`, `StatusChanged`, `Finalized`, and `Reviewed` add an immutable `DecisionEvent` row.
 
 ## Frontend patterns
 
-- **Signals-first state.** `AuthService` holds `token`/`user`/`expiry` as writable
-  signals with `isAuthenticated` computed and `isAdmin` computed; localStorage
-  persistence with rehydration on construction.
-- **Functional guards + interceptor.** `authGuard`/`adminGuard` return `UrlTree`s;
-  the interceptor clears stale sessions on `401` and redirects with `?expired=1`.
-- **Standalone components** per page; modal flows handled in-component; charts are
-  dependency-free SVG components (`DonutChart`, `BarChart`, `CompareChart`) computed
-  from real API data.
-- **Typed DTO mirrors** of `docs/api-contract.md` in `core/models.ts`; enums as string unions.
+- **Signals-first state.** `AuthService` stores `token`, `user`, and `expiry` as writable signals. `isAuthenticated` and `isAdmin` are computed from that state, and the session is restored from localStorage when the service is created.
+- **Functional guards + interceptor.** `authGuard` and `adminGuard` return `UrlTree`s. The interceptor clears an expired session after a `401` and redirects to the login page with `?expired=1`.
+- **Standalone components.** Each page is a standalone component. Modal flows are handled in the component, and the charts (`DonutChart`, `BarChart`, `CompareChart`) are small SVG components that use API data.
+- **Typed DTO mirrors.** `core/models.ts` mirrors the DTOs in `docs/api-contract.md`, with enums represented as string unions.
 
 ## Testing strategy
 
